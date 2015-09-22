@@ -87,7 +87,7 @@ IF (METIS_USE)
 ENDIF (METIS_USE)	
 			
 #################### Generic&External headers ##########################
-SET(TOPDIR_HEAD # better to include selectively depending on arithmetic
+SET(TOPDIR_HEAD
 			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_c.h"
 			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_root.h"
 			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_struc.h"
@@ -469,35 +469,35 @@ SET_TARGET_PROPERTIES(${ARITH_PREFIX}simpletest PROPERTIES
 
 ############### Target output redirection
 
-IF ("${ARITH_PREFIX}" MATCHES "d")
+IF ( ${ARITH_PREFIX} MATCHES "d")
 	ADD_EXECUTABLE(c_example
-							examples/c_example.c
-							"${TOPDIR_HEAD}"
-							"${LIBSEQ_HEAD_FORTRAN}"
-							"${LIBSEQ_HEAD_C}")
+							examples/c_example.c)
 						
 	TARGET_INCLUDE_DIRECTORIES(c_example PUBLIC
 							"${LIBSEQ_INCLUDE}"
-							"${TOPDIR_INCLUDE}")
+							"${TOPDIR_INCLUDE}"
+							)
+							
 						
-	TARGET_LINK_LIBRARIES(c_example 	
-							"lib${ARITH_PREFIX}mumps"
+	TARGET_LINK_LIBRARIES(c_example
 							"${LIBSEQ_LIB}" #aka LIBS
 							"${ORDERINGS_LIB}" #aka LORDERINGS
 							"${BLAS_LIB}" #aka LIBBLAS
-							lib${ARITH_PREFIX}mumps) 
+							lib${ARITH_PREFIX}mumps
+							# "${LIBARITHMUMPS}"
+							) 
 						
 	SET_TARGET_PROPERTIES(c_example PROPERTIES
 							COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C}"
 							LINKER_LANGUAGE C)
 	
-ENDIF ("${ARITH_PREFIX}" MATCHES "d")
+ENDIF ( ${ARITH_PREFIX}  MATCHES "d")
 
 ############
 
-IF ("${ARITH_PREFIX}" MATCHES "d")
+IF (${ARITH_PREFIX} MATCHES "d")
 	SET_PROPERTY(TARGET c_example PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
-ENDIF ("${ARITH_PREFIX}" MATCHES "d")
+ENDIF (${ARITH_PREFIX} MATCHES "d")
 
 SET_PROPERTY(TARGET	${ARITH_PREFIX}simpletest PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
 
