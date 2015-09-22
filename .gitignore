@@ -69,7 +69,6 @@ Mumps5.0.0/PORD/lib/sort.c
 Mumps5.0.0/PORD/lib/symbfac.c
 Mumps5.0.0/PORD/lib/tree.c
 Mumps5.0.0/README
-Mumps5.0.0/README.md
 Mumps5.0.0/SCILAB/Help/help_dmumps.html
 Mumps5.0.0/SCILAB/Help/help_dmumps.xml
 Mumps5.0.0/SCILAB/Help/help_initmumps.html
@@ -505,3 +504,4 @@ Mumps5.0.0/src/zsol_root_parallel.F
 Mumps5.0.0/src/zstatic_ptr_m.F
 Mumps5.0.0/src/ztools.F
 Mumps5.0.0/src/ztype3_root.F
+MumpsProjects/build/
