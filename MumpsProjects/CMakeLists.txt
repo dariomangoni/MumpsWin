@@ -25,7 +25,11 @@ MESSAGE(STATUS "Arithmetic set to '${ARITHMETIC}'. Added '${ARITH_PREFIX}' prefi
 
 ##########################
 
+<<<<<<< HEAD
 SET(MUMPS_ROOT_DIRECTORY "D:/SourceTreeWS/MumpsWin/Mumps5.0.0" CACHE PATH "Mumps root directory" FORCE)
+=======
+SET(MUMPS_ROOT_DIRECTORY "D:/SourceTreeWS/MumpsWin" CACHE PATH "Mumps root directory" FORCE)
+>>>>>>> 64012ade5603d488c2c25f08b2983d666d72a180
 SET(USE_MPI FALSE CACHE BOOL "Select if MPI is needed" FORCE)
 SET(USE_DEFAULT_ORDERING TRUE CACHE BOOL "Select if default ordering library should be used" FORCE)
 SET(USE_MKL_BLAS TRUE CACHE BOOL "Select if default MKL BLAS should be used" FORCE)
