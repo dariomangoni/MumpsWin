@@ -75,7 +75,7 @@ ELSE()
 ENDIF()
 	
 			
-SET(TOPDIR_INCLUDE #aka INCS
+SET(MUMPS_INCLUDE #aka INCS
 			"${CMAKE_SOURCE_DIR}/include") #aka INCSEQ
 			
 SET(BLAS_INCLUDE #aka nothing
@@ -87,12 +87,12 @@ IF (METIS_USE)
 ENDIF (METIS_USE)	
 			
 #################### Generic&External headers ##########################
-SET(TOPDIR_HEAD
-			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_c.h"
-			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_root.h"
-			"${TOPDIR_INCLUDE}/${ARITH_PREFIX}mumps_struc.h"
-			"${TOPDIR_INCLUDE}/mumps_c_types.h"
-			"${TOPDIR_INCLUDE}/mumps_compat.h")				
+SET(MUMPS_HEADERS
+			"${MUMPS_INCLUDE}/${ARITH_PREFIX}mumps_c.h"
+			"${MUMPS_INCLUDE}/${ARITH_PREFIX}mumps_root.h"
+			"${MUMPS_INCLUDE}/${ARITH_PREFIX}mumps_struc.h"
+			"${MUMPS_INCLUDE}/mumps_c_types.h"
+			"${MUMPS_INCLUDE}/mumps_compat.h")				
 										
 #################### Generic&External headers ##########################
 SET(ORDERINGS_LIB #aka LORDERINGS
@@ -211,6 +211,10 @@ ADD_LIBRARY(libmpiseq STATIC
 						${LIBSEQ_HEAD_FORTRAN}
 						$<TARGET_OBJECTS:LIBMPISEQ_C>
 						$<TARGET_OBJECTS:LIBMPISEQ_FORTRAN>)
+						
+SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/libseq")
+SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/libseq")
+SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/libseq")
 								
 ############### MUMPS (src folder) ###############
 # Common MUMPS files
@@ -271,7 +275,6 @@ SET (MUMPS_COMMON_OTHER_HEAD
 
 # Common MUMPS object files (Fortran)
 ADD_LIBRARY(MUMPS_COMMON_OBJ_FORTRAN OBJECT
-						${LIBSEQ_HEAD_FORTRAN}
 						${MUMPS_COMMON_OTHER_HEAD} # not sure IF needed
 						${MUMPS_COMMON_SRC_FORTRAN}
 						${MUMPS_COMMON_OTHER_SRC_FORTRAN})
@@ -282,12 +285,11 @@ SET_TARGET_PROPERTIES(MUMPS_COMMON_OBJ_FORTRAN PROPERTIES
 						LINKER_LANGUAGE FORTRAN)
 
 TARGET_INCLUDE_DIRECTORIES(MUMPS_COMMON_OBJ_FORTRAN	PUBLIC
-						"${TOPDIR_INCLUDE}"
+						"${MUMPS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}")
 						
 # Common MUMPS object files (C)
 ADD_LIBRARY(MUMPS_COMMON_OBJ_C OBJECT
-						${LIBSEQ_HEAD_C}
 						${MUMPS_COMMON_OTHER_HEAD} # not sure IF needed
 						${MUMPS_COMMON_OTHER_SRC_C})
 				
@@ -299,7 +301,7 @@ SET_TARGET_PROPERTIES(MUMPS_COMMON_OBJ_C PROPERTIES
 						LINKER_LANGUAGE C)
 
 TARGET_INCLUDE_DIRECTORIES(MUMPS_COMMON_OBJ_C	PUBLIC
-						"${TOPDIR_INCLUDE}"
+						"${MUMPS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}"
 						"${ORDERINGS_INCLUDE}")
 
@@ -310,7 +312,7 @@ ADD_LIBRARY(libmumps_common STATIC
 
 									
 TARGET_INCLUDE_DIRECTORIES(libmumps_common	PUBLIC
-						"${TOPDIR_INCLUDE}"
+						"${MUMPS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}"
 						"${ORDERINGS_INCLUDE}")
 
@@ -421,7 +423,7 @@ SET_TARGET_PROPERTIES(MUMPS_SPECIFIC_OBJ_FORTRAN PROPERTIES
 						LINKER_LANGUAGE FORTRAN)
 			
 TARGET_INCLUDE_DIRECTORIES(MUMPS_SPECIFIC_OBJ_FORTRAN PUBLIC
-						"${TOPDIR_INCLUDE}"
+						"${MUMPS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}") #aka INCSEQ
 							
 # Arithmetic-specific MUMPS library
@@ -435,47 +437,56 @@ TARGET_LINK_LIBRARIES("lib${ARITH_PREFIX}mumps"
 		
 						
 TARGET_INCLUDE_DIRECTORIES("lib${ARITH_PREFIX}mumps" PUBLIC
-						"${TOPDIR_INCLUDE}"
+						"${MUMPS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}") #aka INCSEQ
 									
 			
-
+SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common PROPERTY ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/lib")
+SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common	PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/lib")
+SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common	PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/lib")
 
 ############### Examples ###############
 SET(LIBARITHMUMPS 	"${CMAKE_SOURCE_DIR}/lib/lib${ARITH_PREFIX}mumps.lib"
 					"${CMAKE_SOURCE_DIR}/lib/libmumps_common.lib")
 
-
 ADD_EXECUTABLE(${ARITH_PREFIX}simpletest
 						examples/${ARITH_PREFIX}simpletest.F
-						"${TOPDIR_HEAD}"
-						"${LIBSEQ_HEAD_FORTRAN}")
+						)
 
 TARGET_LINK_LIBRARIES(${ARITH_PREFIX}simpletest 	
 						"${LIBARITHMUMPS}"
 						"${LIBSEQ_LIB}" #aka LIBS
 						"${ORDERINGS_LIB}" #aka LORDERINGS
-						"${BLAS_LIB}"
-						lib${ARITH_PREFIX}mumps)  #aka LIBBLAS
+						"${BLAS_LIB}" #aka LIBBLAS
+						lib${ARITH_PREFIX}mumps)  
 															
 TARGET_INCLUDE_DIRECTORIES(${ARITH_PREFIX}simpletest PUBLIC
 						"${BLAS_INCLUDE}"
 						"${LIBSEQ_INCLUDE}"
-						"${TOPDIR_INCLUDE}")
+						"${MUMPS_INCLUDE}")
+						
+ADD_DEPENDENCIES(${ARITH_PREFIX}simpletest
+						"lib${ARITH_PREFIX}mumps"
+						libpord
+						libmpiseq
+						)
 									
 SET_TARGET_PROPERTIES(${ARITH_PREFIX}simpletest PROPERTIES
 						COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_FORTRAN}"
 						LINKER_LANGUAGE FORTRAN)
+						
+SET_PROPERTY(TARGET	${ARITH_PREFIX}simpletest PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
 
 ############### Target output redirection
 
 IF ( ${ARITH_PREFIX} MATCHES "d")
+
 	ADD_EXECUTABLE(c_example
 							examples/c_example.c)
 						
 	TARGET_INCLUDE_DIRECTORIES(c_example PUBLIC
 							"${LIBSEQ_INCLUDE}"
-							"${TOPDIR_INCLUDE}"
+							"${MUMPS_INCLUDE}"
 							)
 							
 						
@@ -483,38 +494,24 @@ IF ( ${ARITH_PREFIX} MATCHES "d")
 							"${LIBSEQ_LIB}" #aka LIBS
 							"${ORDERINGS_LIB}" #aka LORDERINGS
 							"${BLAS_LIB}" #aka LIBBLAS
-							lib${ARITH_PREFIX}mumps
-							# "${LIBARITHMUMPS}"
-							) 
+							"${LIBARITHMUMPS}"
+							)
+							
+	ADD_DEPENDENCIES(c_example
+						"lib${ARITH_PREFIX}mumps"
+						libpord
+						libmpiseq
+						)
 						
 	SET_TARGET_PROPERTIES(c_example PROPERTIES
 							COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C}"
 							LINKER_LANGUAGE C)
+
+	SET_PROPERTY(TARGET c_example PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
 	
 ENDIF ( ${ARITH_PREFIX}  MATCHES "d")
 
 ############
-
-IF (${ARITH_PREFIX} MATCHES "d")
-	SET_PROPERTY(TARGET c_example PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
-ENDIF (${ARITH_PREFIX} MATCHES "d")
-
-SET_PROPERTY(TARGET	${ARITH_PREFIX}simpletest PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/examples")
-
-SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common
-			 PROPERTY ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/lib")
-
-SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common
-			 PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/lib")
-
-SET_PROPERTY(TARGET libpord	lib${ARITH_PREFIX}mumps	libmumps_common
-			 PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/lib")
-
-SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/libseq")
-SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/libseq")
-SET_PROPERTY(TARGET libmpiseq PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/libseq")
-
-
 
 ## Installation routine
 #INSTALL(TARGETS libpord
