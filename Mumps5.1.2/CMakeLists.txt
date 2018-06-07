@@ -26,7 +26,7 @@ ENDIF ()
 MESSAGE(STATUS "Arithmetic set to '${ARITHMETIC}'. Added '${ARITH_PREFIX}' prefix...")
 
 
-OPTION(BUILD_EXAMPLES "Build MUMPS examples" ON)
+OPTION(BUILD_EXAMPLES "Build MUMPS examples" OFF)
 OPTION(ENABLE_OPENMP "Enable OpenMP multithreading." ON)
 OPTION(BUILD_SHARED_LIBS "Build shared libraries." ON)
 
@@ -282,6 +282,11 @@ IF (NOT BUILD_SHARED_LIBS)
 							${LIBSEQ_HEAD_FORTRAN}
 							$<TARGET_OBJECTS:LIBMPISEQ_C>
 							$<TARGET_OBJECTS:LIBMPISEQ_FORTRAN>)
+                            
+    SET_TARGET_PROPERTIES(libmpiseq PROPERTIES
+						COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C} -c"
+						COMPILE_DEFINITIONS "${COMPILER_DEFS_C}"
+						LINKER_LANGUAGE C)
 ENDIF()
 
 
@@ -414,6 +419,11 @@ IF (NOT BUILD_SHARED_LIBS)
 							"${MUMPS_INCLUDE_DIRS}"
 							"${LIBSEQ_INCLUDE_DIRS}"
 							"${ORDERINGS_INCLUDE_DIRS}")
+                            
+    SET_TARGET_PROPERTIES(libmumps_common PROPERTIES
+                            COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C} -c"
+                            COMPILE_DEFINITIONS "${COMPILER_DEFS_C}"
+                            LINKER_LANGUAGE C)
 
 	TARGET_LINK_LIBRARIES(libmumps_common
 							libpord
@@ -544,7 +554,12 @@ IF (NOT BUILD_SHARED_LIBS)
 	TARGET_INCLUDE_DIRECTORIES("lib${ARITH_PREFIX}mumps" PUBLIC
 							"${MUMPS_INCLUDE_DIRS}"
 							"${LIBSEQ_INCLUDE_DIRS}") #aka INCSEQ
-						
+                            
+	SET_TARGET_PROPERTIES("lib${ARITH_PREFIX}mumps" PROPERTIES
+                            COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C} -c"
+                            COMPILE_DEFINITIONS "${COMPILER_DEFS_C}"
+                            LINKER_LANGUAGE C)
+                            
 	TARGET_LINK_LIBRARIES("lib${ARITH_PREFIX}mumps" 
 							libmumps_common
 							libpord)
