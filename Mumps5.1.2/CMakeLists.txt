@@ -284,7 +284,7 @@ IF (NOT BUILD_SHARED_LIBS)
 							$<TARGET_OBJECTS:LIBMPISEQ_FORTRAN>)
                             
     SET_TARGET_PROPERTIES(libmpiseq PROPERTIES
-						COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C} -c"
+						LINKER_FLAGS "${GENERIC_COMPILER_FLAGS_C}"
 						COMPILE_DEFINITIONS "${COMPILER_DEFS_C}"
 						LINKER_LANGUAGE C)
 ENDIF()
@@ -421,7 +421,7 @@ IF (NOT BUILD_SHARED_LIBS)
 							"${ORDERINGS_INCLUDE_DIRS}")
                             
     SET_TARGET_PROPERTIES(libmumps_common PROPERTIES
-                            COMPILE_FLAGS "${GENERIC_COMPILER_FLAGS_C} -c"
+                            LINKER_FLAGS "${GENERIC_COMPILER_FLAGS_C}"
                             COMPILE_DEFINITIONS "${COMPILER_DEFS_C}"
                             LINKER_LANGUAGE C)
 
